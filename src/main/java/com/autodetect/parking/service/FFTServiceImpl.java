@@ -8,30 +8,13 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.autodetect.parking.ExtrimValues;
+import com.autodetect.parking.ImageType;
 import com.fft.Complex;
 import com.fft.FFT;
 
 public class FFTServiceImpl implements FFTService{
 
-
-	/**
-	 * Grayscale
-	 */
-//	private static final int AMP_MIN = 	  -1000000;
-//	private static final int AMP_MAX = 	  12000000;
-
-	/**
-	 * RGB24
-	 */
-	private static final double AMP_MIN = -8.5E10;
-	private static final double AMP_MAX =  7.5E11;
-	
-	/**
-	 * HSV
-	 */
-//	private static final double AMP_MIN = -6500;
-//	private static final double AMP_MAX =  50000;
-	
 	private static final int AMP_PIECE = 5;
 	private static final String OUT_FF_TDATA_TXT = "outFFTdata.txt";
 	private PrintStream ps=null;
@@ -70,21 +53,16 @@ public class FFTServiceImpl implements FFTService{
     	return data;
 	}
 
-	public int[] prepareGraphRe(Complex[][] data, int h, int w) {
-	
-		return prepareGraphRe(data, h, w, true);
-	}
-	
-	public int[] prepareGraphRe(Complex[][] data, int h, int w, boolean isAdoptationRequired) {
+	public int[] prepareGraphRe(Complex[][] data, int h, int w, ImageType type) {
 		int[] graph = new int[GRAPH_LENGTH];
 
-		double max = AMP_MAX;
-		double min = AMP_MIN;
+		double max = ExtrimValues.getMaxByImageType(type);
+		double min = ExtrimValues.getMinByImageType(type);
 
     	for(int j =0; j<h; j++) {
     		for(int i=0; i<w; i++) {
     			double d = data[j][i].re();
-    			int index= isAdoptationRequired ? (int)adoptFFTValue(d, max, min).re() : (int)d;
+    			int index= (int)adoptFFTValue(d, max, min).re();
     			int value = graph[index];
     			graph[index]=value + AMP_PIECE;
     		}
@@ -93,11 +71,11 @@ public class FFTServiceImpl implements FFTService{
 		return graph;
 	}
 
-	public int[] prepareGraphIm(Complex[][] data, int h, int w ) {
+	public int[] prepareGraphIm(Complex[][] data, int h, int w, ImageType type ) {
 		int[] graph = new int[GRAPH_LENGTH];
 
-		double max = AMP_MAX;
-		double min = AMP_MIN;
+		double max = ExtrimValues.getMaxImByImageType(type);
+		double min = ExtrimValues.getMinImByImageType(type);
 
     	for(int j =0; j<h; j++) {
     		for(int i=0; i<w; i++) {
@@ -110,19 +88,33 @@ public class FFTServiceImpl implements FFTService{
 		return graph;
 	}
 
-	public int[] prepareGraph(Complex[][] data, int h, int w) {
+	public int[] prepareGraph(Complex[][] data, int h, int w, ImageType type) {
+		int[] graphRe = new int[GRAPH_LENGTH];
+		int[] graphIm = new int[GRAPH_LENGTH];
 		int[] graph = new int[GRAPH_LENGTH];
 
-		double max = AMP_MAX;
-		double min = AMP_MIN;
+		double max = ExtrimValues.getMaxByImageType(type);
+		double min = ExtrimValues.getMinByImageType(type);
+		double max_im = ExtrimValues.getMaxImByImageType(type);
+		double min_im = ExtrimValues.getMinImByImageType(type);
 
     	for(int j =0; j<h; j++) {
     		for(int i=0; i<w; i++) {
-    			int index= (int)adoptFFTValue(data[j][i], max, min);
-    			int value = graph[index];
-    			graph[index]=value + AMP_PIECE;
+    			double d = data[j][i].im();
+    			int index= (int)adoptFFTValue(d, max_im, min_im).im();
+    			int value = graphIm[index];
+    			graphIm[index]=value + AMP_PIECE;
+
+    			d = data[j][i].re();
+    			index= (int)adoptFFTValue(d, max, min).re();
+    			value = graphRe[index];
+    			graphRe[index]=value + AMP_PIECE;    		
     		}
-    	}		
+    	}
+    	
+    	for(int i=0; i<GRAPH_LENGTH; i++) {			
+			graph[i] = (int)Math.sqrt(graphRe[i]*graphRe[i] + graphIm[i]*graphIm[i]);
+    	}
 		return graph;
 	}
 
@@ -349,11 +341,11 @@ public class FFTServiceImpl implements FFTService{
 	/**
 	 * Create image from fft data
 	 */
-	public BufferedImage createAdoptedImage(Complex[][] data, int h, int w) {
+	public BufferedImage createAdoptedImage(Complex[][] data, int h, int w, ImageType type) {
 		Complex[][] newData = new Complex[h][w];
 
-		double max = AMP_MAX;
-		double min = AMP_MIN;
+		double max = ExtrimValues.getMaxByImageType(type);
+		double min = ExtrimValues.getMinByImageType(type);
 
     	for(int j =0; j<h; j++) {
     		for(int i=0; i<w; i++) {

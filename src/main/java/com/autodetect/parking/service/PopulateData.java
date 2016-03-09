@@ -16,5 +16,6 @@ public interface PopulateData {
 	Complex[][] getGrayScaleData(int id);
 	Complex[][] convertRGBtoHSV(BufferedImage img);
 	BufferedImage populateHSVImageData(String path, int id);
+	BufferedImage populateImageData(String path, int id, ImageType type);
 
 }

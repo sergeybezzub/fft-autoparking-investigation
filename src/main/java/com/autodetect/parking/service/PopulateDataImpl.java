@@ -21,6 +21,20 @@ public class PopulateDataImpl implements PopulateData {
 
 	FFTService fftService = new FFTServiceImpl();
 	
+	@Override
+	public BufferedImage populateImageData(String path, int id, ImageType type) {
+		switch(type) {
+			case GRAYSCALE:
+				return populateGrayscaleImageData(path,id);
+			case RGB24:
+				return populateRGB24ImageData(path,id);
+			case HSV:
+				return populateHSVImageData(path,id);
+			default:
+				return populateGrayscaleImageData(path,id);
+		}
+	}
+
 	public BufferedImage populateGrayscaleImageData(String path, int id) {
 		BufferedImage img=null;
 		try {

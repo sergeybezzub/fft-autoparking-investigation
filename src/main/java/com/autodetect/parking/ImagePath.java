@@ -12,10 +12,10 @@ public enum ImagePath {
 	EMPTY1("/empty1.png"),
 	EMPTY2("/empty2.png"),
 	EMPTY3("/empty3.png"),
-	EMPTY4("/empty4.png"),
+	EMPTY4("/empty7.png"),
 	EMPTY5("/empty5.png"),
 	EMPTY6("/empty6.png"),
-	EMPTY7("/empty7.png"),
+	EMPTY7("/empty4.png"),
 	EMPTY8("/empty8.png");
 	
 	private String path;

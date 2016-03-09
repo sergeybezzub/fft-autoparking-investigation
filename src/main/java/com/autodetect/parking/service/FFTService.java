@@ -2,6 +2,7 @@ package com.autodetect.parking.service;
 
 import java.awt.image.BufferedImage;
 
+import com.autodetect.parking.ImageType;
 import com.fft.Complex;
 
 public interface FFTService {
@@ -15,17 +16,15 @@ public interface FFTService {
 	BufferedImage createImage(Complex[][] data, int height, int weidth);
 	void printData(Complex[][] fftData, int height, int width);
 	void printData(Complex[][] fftData, int height, int width, String title);
-	BufferedImage createAdoptedImage(Complex[][] data, int height, int weidth);
+	BufferedImage createAdoptedImage(Complex[][] data, int height, int weidth, ImageType type);
 	double getMax(Complex[][] fftData, int height, int width);
 	double getMin(Complex[][] fftData, int height, int width);
 	double getMaxIm(Complex[][] fftData, int height, int width);
 	double getMinIm(Complex[][] fftData, int height, int width);
 	Complex[][] createGreyScaleImageData(BufferedImage img);
 	void prepareData(Complex[][] data, int h, int w);
-	int[] prepareGraph(Complex[][] data, int height, int width);
-	int[] prepareGraphRe(Complex[][] data, int height, int width);
-	int[] prepareGraphIm(Complex[][] data, int height, int width);
-	int[] prepareGraphRe(Complex[][] data, int h, int w, boolean isAdoptationRequired);
-	//int[] prepareGraph(BufferedImage img);
+	int[] prepareGraph(Complex[][] data, int height, int width, ImageType type);
+	int[] prepareGraphRe(Complex[][] data, int height, int width, ImageType type);
+	int[] prepareGraphIm(Complex[][] data, int height, int width, ImageType type);
 	void log(String message);	
 }

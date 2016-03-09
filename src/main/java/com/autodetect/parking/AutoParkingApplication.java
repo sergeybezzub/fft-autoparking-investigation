@@ -55,6 +55,14 @@ public class AutoParkingApplication extends JPanel {
 
 	public static void main(String[] args) {
 
+		/**
+		 * Image type defined in ImageType enum: GRAYSCALE, RGB24, HSV
+		 */
+		String imageType = null;
+		if( args.length > 0) {
+			imageType=args[0];
+		}
+		
 		FFTService fftService = new FFTServiceImpl();
 		PopulateData populateService = new PopulateDataImpl();
 
@@ -86,29 +94,11 @@ public class AutoParkingApplication extends JPanel {
 		
 		for(ImagePath path : ImagePath.values()) {
 
-			/**
-			 * Grayscale
-			 */
-//			BufferedImage img = populateService.populateGrayscaleImageData(path.getPath(), i);	
-//			BufferedImage fftimg = populateService.populateFFTImageData(img.getHeight(), img.getWidth(), i, ImageType.GRAYSCALE);
-
-			/**
-			 * RGB24
-			 */
-			BufferedImage img = populateService.populateRGB24ImageData(path.getPath(), i);	
-			BufferedImage fftimg = populateService.populateFFTImageData(img.getHeight(), img.getWidth(), i, ImageType.RGB24);
-
-			/**
-			 * HSV
-			 */
-//			BufferedImage img = populateService.populateHSVImageData(path.getPath(), i);	
-//			BufferedImage fftimg = populateService.populateFFTImageData(img.getHeight(), img.getWidth(), i, ImageType.HSV);
-
+			BufferedImage img = populateService.populateImageData(path.getPath(), i, ImageType.getImageType(imageType));	
+			BufferedImage fftimg = populateService.populateFFTImageData(img.getHeight(), img.getWidth(), i, ImageType.getImageType(imageType));
 			BufferedImage imgg = new BufferedImage(img.getWidth() * 5, img.getHeight(), BufferedImage.TYPE_INT_BGR);
-			a.paintGraph(imgg.getGraphics(), 0, fftService.prepareGraphRe(populateService.getFFTData(i),img.getHeight(),img.getWidth()));
-			a.paintGraph(imgg.getGraphics(), 2, fftService.prepareGraphIm(populateService.getFFTData(i),img.getHeight(),img.getWidth()));
-			a.paintGraph(imgg.getGraphics(), 3, fftService.prepareGraph(  populateService.getFFTData(i),img.getHeight(),img.getWidth()));
-			
+			a.paintGraph(imgg.getGraphics(), 3, fftService.prepareGraph(  populateService.getFFTData(i),img.getHeight(),img.getWidth(), ImageType.getImageType(imageType)));
+
 			BufferedImage rowImage = new BufferedImage(img.getWidth() * 7, img.getHeight(),  BufferedImage.TYPE_INT_BGR);
 			a.paintRowImage(rowImage.getGraphics(), img, fftimg, imgg);
 			a.addRowImage(i, rowImage);
@@ -154,13 +144,13 @@ public class AutoParkingApplication extends JPanel {
 			return;
 		}
 		
-		int stepWidth =5;
+		int stepWidth =3;
 		g.setColor(Colors.getColorValue(index));
 
 		int x0 = 0;
 		int y0 = 255;
 
-		for (int i = 1; i < 255; i++) {
+		for (int i = 1; i < data.length; i++) {
 			int x1 = x0 + (i - 1) * stepWidth;
 			int a1 = data[i - 1] > 255 ? 255 : data[i - 1];
 			int a2 = data[i] > 255 ? 255 : data[i];
