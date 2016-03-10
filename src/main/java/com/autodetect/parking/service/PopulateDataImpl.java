@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +19,7 @@ public class PopulateDataImpl implements PopulateData {
 	private final static Map<String,Complex[][]> grayScaleData = new HashMap<String,Complex[][]>();
 	private final static Map<String,Complex[][]> color24Data = new HashMap<String,Complex[][]>();
 	private final static Map<String,Complex[][]> colorHSVData = new HashMap<String,Complex[][]>();
+	private final static Map<String,Integer[]> graphData = new HashMap<String,Integer[]>();
 
 	FFTService fftService = new FFTServiceImpl();
 	
@@ -124,7 +126,10 @@ public class PopulateDataImpl implements PopulateData {
 		
 		Complex[][] fftdata = fftService.performFFT(data, h,w );				
 		fftData.put(""+id, fftdata);
-
+		int[] intData = fftService.prepareGraph(  fftdata,h,w, type);
+		Integer[] integerData = Arrays.stream( intData ).boxed().toArray( Integer[]::new );
+		graphData.put(""+id, integerData);
+		
 		double max = fftService.getMax(fftdata, h, w );
 		double min = fftService.getMin(fftdata, h, w );
 		double max1 = fftService.getMaxIm(fftdata, h, w );
@@ -185,6 +190,57 @@ public class PopulateDataImpl implements PopulateData {
     	}
     	
     	return data;
+	}
+
+	@Override
+	public Integer[] getGraphData(int id) {
+		return graphData.get(""+id);
+	}
+
+	@Override
+	public double calculateCorrelation(Integer[] data, Integer[] etaloneData) {
+		
+		if( etaloneData == null || etaloneData.length == 0) {
+			return -1;
+		}
+
+		if( data == null || data.length == 0) {
+			return 0;
+		}
+
+		double avgX = calculateAVG(data);
+		double avgY = calculateAVG(etaloneData);
+		
+		double sumTopXY=0;
+		for(int i=0; i< data.length; i++) {
+			sumTopXY+=(data[i]-avgX)*(etaloneData[i]-avgY);
+		}
+		
+		double sumBottomX=0;
+		for(int i=0; i< data.length; i++) {
+			sumBottomX+=(data[i]-avgX)*(data[i]-avgX);
+		}
+
+		double sumBottomY=0;
+		for(int i=0; i< data.length; i++) {
+			sumBottomY+=(etaloneData[i]-avgY)*(etaloneData[i]-avgY);
+		}
+		
+		double tmp = Math.sqrt(sumBottomX) * Math.sqrt(sumBottomY);
+		return sumTopXY / tmp;
+	}
+
+	private double calculateAVG(Integer[] data) {
+		double sum=0;
+
+		if( data == null || data.length == 0) {
+			return sum;
+		}
+		
+		for( Integer v : data) {
+			sum+=v;
+		}
+		return sum/data.length;
 	}
 
 }

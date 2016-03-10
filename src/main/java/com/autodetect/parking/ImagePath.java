@@ -1,6 +1,7 @@
 package com.autodetect.parking;
 
 public enum ImagePath {
+	EMPTY3("/empty3.png"),
 	BUSY1("/busy1.png"),
 	BUSY2("/busy2.png"),
 	BUSY3("/busy3.png"),
@@ -11,7 +12,6 @@ public enum ImagePath {
 	BUSY8("/busy8.png"),
 	EMPTY1("/empty1.png"),
 	EMPTY2("/empty2.png"),
-	EMPTY3("/empty3.png"),
 	EMPTY4("/empty7.png"),
 	EMPTY5("/empty5.png"),
 	EMPTY6("/empty6.png"),

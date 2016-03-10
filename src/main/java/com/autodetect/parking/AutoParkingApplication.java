@@ -13,8 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
-import com.autodetect.parking.service.FFTService;
-import com.autodetect.parking.service.FFTServiceImpl;
 import com.autodetect.parking.service.PopulateData;
 import com.autodetect.parking.service.PopulateDataImpl;
 
@@ -63,7 +61,7 @@ public class AutoParkingApplication extends JPanel {
 			imageType=args[0];
 		}
 		
-		FFTService fftService = new FFTServiceImpl();
+//		FFTService fftService = new FFTServiceImpl();
 		PopulateData populateService = new PopulateDataImpl();
 
 		final AutoParkingApplication a = new AutoParkingApplication();
@@ -86,19 +84,20 @@ public class AutoParkingApplication extends JPanel {
 			}
 		});
 
-		/**
-		 * Load images from file
-		 */
-		
 		int i=1;
 		
+		/**
+		 * Load images from files and draw graphics
+		 */
 		for(ImagePath path : ImagePath.values()) {
 
 			BufferedImage img = populateService.populateImageData(path.getPath(), i, ImageType.getImageType(imageType));	
 			BufferedImage fftimg = populateService.populateFFTImageData(img.getHeight(), img.getWidth(), i, ImageType.getImageType(imageType));
-			BufferedImage imgg = new BufferedImage(img.getWidth() * 5, img.getHeight(), BufferedImage.TYPE_INT_BGR);
-			a.paintGraph(imgg.getGraphics(), 3, fftService.prepareGraph(  populateService.getFFTData(i),img.getHeight(),img.getWidth(), ImageType.getImageType(imageType)));
-
+			BufferedImage imgg = new BufferedImage(img.getWidth() * 5, img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+			a.paintGraph(imgg.getGraphics(), 3, populateService.getGraphData(i));
+			a.paintGraph(imgg.getGraphics(), 8, populateService.getGraphData(PopulateData.etaloneID));
+			String text = String.format("C=%5.4f", populateService.calculateCorrelation(populateService.getGraphData(i), populateService.getGraphData(PopulateData.etaloneID)));
+			a.paintText(imgg.getGraphics(), text, 10, 20);
 			BufferedImage rowImage = new BufferedImage(img.getWidth() * 7, img.getHeight(),  BufferedImage.TYPE_INT_BGR);
 			a.paintRowImage(rowImage.getGraphics(), img, fftimg, imgg);
 			a.addRowImage(i, rowImage);
@@ -139,7 +138,7 @@ public class AutoParkingApplication extends JPanel {
 		}
 	}
 	
-	private void paintGraph(Graphics g, int index, int[] data) {
+	private void paintGraph(Graphics g, int index, Integer[] data) {
 		if (data == null || data.length ==0) {
 			return;
 		}
@@ -162,6 +161,10 @@ public class AutoParkingApplication extends JPanel {
 		}
 
 	}
+
+	private void paintText(Graphics g, String text, int x, int y) {
+		g.drawString(text, x,y);
+	}	
 	
 	private synchronized void addRowImage(int key, BufferedImage img) {
 		this.imagesMap.put(key, img);
