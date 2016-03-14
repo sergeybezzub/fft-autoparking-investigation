@@ -21,5 +21,4 @@ public interface PopulateData {
 	BufferedImage populateHSVImageData(String path, int id);
 	BufferedImage populateImageData(String path, int id, ImageType type);
 	double calculateCorrelation(Integer[] data, Integer[] etaloneData);
-
 }

@@ -114,6 +114,11 @@ public class FFTServiceImpl implements FFTService{
     	
     	for(int i=0; i<GRAPH_LENGTH; i++) {			
 			graph[i] = (int)Math.sqrt(graphRe[i]*graphRe[i] + graphIm[i]*graphIm[i]);
+//###### cut any extrime top values
+			if(graph[i]>255) {
+				graph[i]=255;
+			}
+//######
     	}
 		return graph;
 	}

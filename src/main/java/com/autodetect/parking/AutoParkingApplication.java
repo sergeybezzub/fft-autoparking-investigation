@@ -22,10 +22,10 @@ import com.autodetect.parking.service.PopulateDataImpl;
 public class AutoParkingApplication extends JPanel {
 	private static final long serialVersionUID = 1130163759606342268L;
 
-	int frameWidth = 256*5;
-	int frameHight = 256*ImagePath.values().length;
+	private int frameWidth = 256+360;
+	private int frameHight = 256*ImagePath.values().length;
 	
-	private BufferedImage imgTmp = new BufferedImage(frameWidth, frameHight, BufferedImage.TYPE_INT_ARGB);
+	private BufferedImage imgTmp = new BufferedImage(frameWidth, 1024, BufferedImage.TYPE_INT_ARGB);
 
 	private Map<Integer, BufferedImage> imagesMap = new HashMap<Integer, BufferedImage>();
 
@@ -61,12 +61,11 @@ public class AutoParkingApplication extends JPanel {
 			imageType=args[0];
 		}
 		
-//		FFTService fftService = new FFTServiceImpl();
 		PopulateData populateService = new PopulateDataImpl();
 
 		final AutoParkingApplication a = new AutoParkingApplication();
 
-		JFrame f = new JFrame("FFT Processing");
+		JFrame f = new JFrame("FFT Processing - "+ImageType.getImageType(imageType).name());
 		f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		final JScrollPane pane = new JScrollPane();
@@ -74,6 +73,7 @@ public class AutoParkingApplication extends JPanel {
 		pane.setViewportView(a);
 
 		f.pack();
+		f.setSize(a.getFrameWidth()+32, 1024);
 		f.setVisible(true);
 		a.repaint();
 
@@ -93,20 +93,18 @@ public class AutoParkingApplication extends JPanel {
 
 			BufferedImage img = populateService.populateImageData(path.getPath(), i, ImageType.getImageType(imageType));	
 			BufferedImage fftimg = populateService.populateFFTImageData(img.getHeight(), img.getWidth(), i, ImageType.getImageType(imageType));
-			BufferedImage imgg = new BufferedImage(img.getWidth() * 5, img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+			BufferedImage imgg = new BufferedImage(360, img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 			a.paintGraph(imgg.getGraphics(), 3, populateService.getGraphData(i));
 			a.paintGraph(imgg.getGraphics(), 8, populateService.getGraphData(PopulateData.etaloneID));
 			String text = String.format("C=%5.4f", populateService.calculateCorrelation(populateService.getGraphData(i), populateService.getGraphData(PopulateData.etaloneID)));
-			a.paintText(imgg.getGraphics(), text, 10, 20);
+			a.paintText(imgg.getGraphics(), text, 300, 20);
 			BufferedImage rowImage = new BufferedImage(img.getWidth() * 7, img.getHeight(),  BufferedImage.TYPE_INT_BGR);
 			a.paintRowImage(rowImage.getGraphics(), img, fftimg, imgg);
 			a.addRowImage(i, rowImage);
 			
 			i++;
-			pane.revalidate();
+			a.repaint();
 		}
-
-		pane.revalidate();
 	}
 
 	private void paintImages(Graphics g) {
@@ -143,7 +141,7 @@ public class AutoParkingApplication extends JPanel {
 			return;
 		}
 		
-		int stepWidth =3;
+		int stepWidth =1;
 		g.setColor(Colors.getColorValue(index));
 
 		int x0 = 0;
@@ -176,6 +174,14 @@ public class AutoParkingApplication extends JPanel {
 
 	public synchronized Set<Integer> getImageKeys() {
 		return imagesMap.keySet();
+	}
+
+	public int getFrameWidth() {
+		return frameWidth;
+	}
+
+	public int getFrameHight() {
+		return frameHight;
 	}
 
 }

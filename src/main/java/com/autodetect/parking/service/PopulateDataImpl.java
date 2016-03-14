@@ -211,34 +211,28 @@ public class PopulateDataImpl implements PopulateData {
 		double avgX = calculateAVG(data);
 		double avgY = calculateAVG(etaloneData);
 		
-		double sumTopXY=0;
+		double nominator=0;
+		double denominatorY=0;
+		double denominatorX=0;
 		for(int i=0; i< data.length; i++) {
-			sumTopXY+=(data[i]-avgX)*(etaloneData[i]-avgY);
+			nominator+=(data[i]-avgX)*(etaloneData[i]-avgY);
+			denominatorX+=(data[i]-avgX)*(data[i]-avgX);
+			denominatorY+=(etaloneData[i]-avgY)*(etaloneData[i]-avgY);
 		}
 		
-		double sumBottomX=0;
-		for(int i=0; i< data.length; i++) {
-			sumBottomX+=(data[i]-avgX)*(data[i]-avgX);
-		}
-
-		double sumBottomY=0;
-		for(int i=0; i< data.length; i++) {
-			sumBottomY+=(etaloneData[i]-avgY)*(etaloneData[i]-avgY);
-		}
-		
-		double tmp = Math.sqrt(sumBottomX) * Math.sqrt(sumBottomY);
-		return sumTopXY / tmp;
+		double denominator = Math.sqrt(denominatorX * denominatorY);
+		return nominator / denominator;
 	}
 
-	private double calculateAVG(Integer[] data) {
-		double sum=0;
+	private <T extends Number> double calculateAVG(T[] data) {
+		double sum= 0;
 
 		if( data == null || data.length == 0) {
 			return sum;
 		}
 		
-		for( Integer v : data) {
-			sum+=v;
+		for( T v : data) {
+			sum+=v.doubleValue();
 		}
 		return sum/data.length;
 	}
